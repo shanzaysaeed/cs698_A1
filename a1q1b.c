@@ -9,7 +9,7 @@
 #define BUFFER_SIZE 1024
 #define FAIL -1
 
-// Function declarations (add them here if not included via a header file)
+// Function declarations (add these if not using a separate header file)
 int openSocketConnection(char *host, int port);
 int getNextMessage(int socket, char *buffer, int bufferSize);
 int openFileToWrite(char *filename);
@@ -17,18 +17,22 @@ int writeToFile(char *buffer);
 void closeFile();
 void closeSocket(int socket);
 
+// Function to write data from a socket to a file
 int writeDataFromSocketToFile(char *host, int port) {
     char filename[FILENAME_SIZE];
     char buffer[BUFFER_SIZE];
-    int socket = openSocketConnection(host, port);
     
+    // Open socket connection
+    int socket = openSocketConnection(host, port);
     if (socket < 0) {
         printf("Unable to open socket connection\n");
         return FAIL;
     }
 
+    // Receive the filename
     if (getNextMessage(socket, filename, FILENAME_SIZE) > 0) {
         if (openFileToWrite(filename) > 0) {
+            // Receive and write data to file
             while (getNextMessage(socket, buffer, BUFFER_SIZE) > 0) {
                 if (!(writeToFile(buffer) > 0))
                     break;
@@ -37,11 +41,12 @@ int writeDataFromSocketToFile(char *host, int port) {
         closeFile();
     }
 
+    // Close socket connection
     closeSocket(socket);
     return 0;
 }
 
-// Add the main function here
+// Main function
 int main() {
     char *host = "127.0.0.1";  // Modify as needed
     int port = 8080;           // Modify as needed
