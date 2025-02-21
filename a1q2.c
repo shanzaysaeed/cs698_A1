@@ -1,16 +1,19 @@
-#include <stdlib.h>
 #include <stdio.h>
-    
-#define BUFSIZE 256
-    
-// This program prints the size of a specified file in bytes
-int main(int argc, char** argv) {
-    // Ensure that the user supplied exactly one command line argument
-    if (argc != 2) { 
-        fprintf(stderr, "Please provide the address of a file as an input.\n");
-        return -1;
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+    // Ensure exactly one argument is provided
+    if (argc != 2) {
+        fprintf(stderr, "Error: Please provide a valid file path.\n");
+        return 1;
     }
-    char cmd[BUFSIZE] = "wc -c < ";
-    strcat(cmd, argv[1]);
-    system(cmd);
+
+    // Execute 'wc -c' safely
+    if (execlp("wc", "wc", "-c", argv[1], (char *)NULL) == -1) {
+        perror("Execution failed");
+        return 1;
+    }
+
+    return 0; // This will never execute if execlp succeeds
 }
