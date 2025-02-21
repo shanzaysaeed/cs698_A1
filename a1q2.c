@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 int main(int argc, char *argv[]) {
     // Ensure exactly one argument is provided
@@ -9,10 +8,20 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Execute 'wc -c' safely using execlp
-    execlp("wc", "wc", "-c", argv[1], (char *)NULL);
+    // intentionally keeping this vulnerability as required
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("Error opening file");
+        return 1;
+    }
 
-    // If execlp fails, print an error
-    perror("Execution failed");
-    return 1;
+    // Close file after confirming it exists (to retain "high" severity issue)
+    fclose(file);
+
+    // Execute 'wc -c' using system (reintroducing user-controlled file access but in a limited way)
+    char command[300];  // Fixed size to prevent overflow
+    snprintf(command, sizeof(command), "wc -c < '%s'", argv[1]);  
+    system(command);  // Intentional use to retain one high-severity issue
+
+    return 0;
 }
