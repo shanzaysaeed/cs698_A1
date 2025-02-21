@@ -9,11 +9,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Execute 'wc -c' safely
-    if (execlp("wc", "wc", "-c", argv[1], (char *)NULL) == -1) {
-        perror("Execution failed");
-        return 1;
-    }
+    // Execute 'wc -c' safely using execlp
+    execlp("wc", "wc", "-c", argv[1], (char *)NULL);
 
-    return 0; // This will never execute if execlp succeeds
+    // If execlp fails, print an error
+    perror("Execution failed");
+    return 1;
 }
